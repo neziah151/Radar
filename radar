@@ -1,7 +1,7 @@
 --- Drawing Player Radar
---- Made by Ravex
---- Mar 25 2025
-local scriptver = 'v1.3'
+--- Made by topit
+--- Nov 28 2022
+local scriptver = 'v1.3.2'
 
 -- v1.3.2 changelog
 --* Dragging the radar now moves the hovertext properly
@@ -364,6 +364,39 @@ do
         notif:Remove()
         return
     else
+        -- might as well place loaded notification here 
+        notif.Text = ('Loaded Drawing Radar %s\n\nControls:\n[-]: zoom out     [+]: zoom in     [End]: exit script'):format(scriptver) -- [Home]: toggle radar 
+        
+        local gameWarning = gameNotes[thisId]
+        
+        if ( gameWarning ) then 
+            notif.Text = notif.Text .. string.format('\n\nGame warning: %s', gameWarning) -- fuck fluxus for not having ..= support 
+        end
+        
+        task.spawn(function()
+            tweenExp(notif, 'Transparency', 1, 0.25)
+            tweenExp(notif, 'Position', newV2(halfWidth, 150), 0.25)
+            task.wait(gameWarning and 10 or 5)
+            
+            tweenExp(notif, 'Position', newV2(halfWidth, 200), 0.25)
+            tweenExp(notif, 'Transparency', 0, 0.25)
+            task.wait(0.5)
+            
+            if ( workspace.StreamingEnabled ) then
+                notif.Text = 'It looks like this game uses StreamingEnabled - Fallback mode is now enabled.'
+                tweenExp(notif, 'Transparency', 1, 0.25)
+                tweenExp(notif, 'Position', newV2(halfWidth, 150), 0.25)
+                task.wait(5)
+                
+                tweenExp(notif, 'Position', newV2(halfWidth, 200), 0.25)
+                tweenExp(notif, 'Transparency', 0, 0.25)
+                task.wait(1)
+            end
+            
+            notif:Remove()
+        end)
+    end
+end
 
 --- Player managers --- 
 if ( workspace.StreamingEnabled ) then
